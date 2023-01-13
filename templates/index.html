@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container-fluid">
+        <h1>{% block title %} Bienvenue sur l'application de recommandation {% endblock %}</h1>
+        <h4>Veuillez sélectionner l'utilisateur pour lequel nous devons faire des recommandations:</h4>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                {% if liste_id %}
+                    {% set count = [0] %}
+                    {% for id in liste_id[:10] %}
+                        {% if count.append(count.pop() + 1) %}{% endif %} {# increment count by 1 #}
+                        <label id="user_id{{ count[0] }}" class="btn btn-secondary">
+                        <input type="radio" name="options"  autocomplete="off" checked>{{ id }}
+                        </label>
+                    {% endfor %}
+                {% else %}
+                    <p style="font-size: 16px; text-align: center;">Aucun id disponible</p>
+                {% endif %}
+                </div>
+            </div>
+            <div class="col-sm-6"></div>
+                <nav aria-label="col-sm Page navigation">
+                    <ul class="pagination">
+                    <li class="col-sm page-item">
+                        <button class="page-link" name="previousBtn" onclick="id_previous()" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                            <span class="sr-only">Previous</span>
+                        </button>
+                    </li>
+                    <li class="col-sm page-item">
+                        <button class="page-link" name="nextBtn" onclick="id_next()" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                            <span class="sr-only">Next</span>
+                        </button>
+                    </li>
+                    </ul>
+                </nav>
+            </div>
+        
+        <h4>Veuillez sélectionner les paramètres de recommandation:</h4>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="reco_1" value="1">
+                        <strong>en fonction du profil d'un article de l'utilisateur</strong>
+                    </label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="exampleRadios" id="ref1" value="option1" checked>
+                        <label class="form-check-label" for="exampleRadios1">
+                            La référence est le premier article
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="exampleRadios" id="ref2" value="option2">
+                        <label class="form-check-label" for="exampleRadios2">
+                            La référence est le dernier article
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="exampleRadios" id="ref3" value="option3">
+                        <label class="form-check-label" for="exampleRadios3">
+                            La référence est une moyenne des articles
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label for="nb_reco_1">Sélectionnez un nombre de recommandations :</label>
+                        <select id="nb_reco_1">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="form-group">
+                <label>
+                    <input type="checkbox" id="reco_2" name="reco_2" value="2">
+                    <strong>Recommandation collaborative</strong>
+                </label>
+                <div class="form-group">
+                    <label for="nb_reco_2">
+                        Sélectionnez un nombre de recommandations :
+                    </label>
+                    <select id="nb_reco_2">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                    </select>
+                </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-sm-12 text-center">
+            <button id="reco" type="button" class="btn btn-primary">Faire une recommandation</button>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-sm-6">
+            <table id="table_1" class="table">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Id de l'article</th>
+                    <th scope="col">Classement</th>
+                </tr>
+                </thead>
+                <tbody id="table1_tbody">
+                <!-- <tr>
+                    <th scope="row">1</th>
+                    <td>Ligne 1, colonne 1</td>
+                    <td>Ligne 1, colonne 2</td>
+                </tr>
+                <tr>
+                    <th scope="row">2</th>
+                    <td>Ligne 2, colonne 1</td>
+                    <td>Ligne 2, colonne 2</td>
+                </tr> -->
+                </tbody>
+            </table>
+            </div>
+            <div class="col-sm-6">
+            <table id="table_2" class="table">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Id de l'article</th>
+                    <th scope="col">Classement</th>
+                </tr>
+                </thead>
+                <tbody id="table2_tbody">
+                <!-- <tr>
+                    <th scope="row">1</th>
+                    <td>Ligne 1, colonne 1</td>
+                    <td>Ligne 1, colonne 2</td>
+                </tr>
+                <tr>
+                    <th scope="row">2</th>
+                    <td>Ligne 2, colonne 1</td>
+                    <td>Ligne 2, colonne 2</td>
+                </tr> -->
+                </tbody>
+            </table>
+            </div>
+        </div>
+    </div>
+      
+    <!-- Javascript code for next and previous button -->
+    <script>
+        let id = [];
+        id={{ liste_id | tojson }};
+        let i = 9;
+
+        function id_next() {
+            // penser à gérer le cas ou le nombre d'id n'est pas un multiple de 10
+            console.log(i)
+            if (i+10 >= id.length - 1) {
+                return false;
+            }
+            for (let j = 1; j < 11; j++) {
+                i++;
+                $('#user_id'+j).html('<input type="radio" name="options" autocomplete="off" checked="">'+id[i]);
+
+            }
+            
+        }
+        function id_previous() {
+            if (i-9 <= 0) {
+                return false;
+            }
+            for (let j = 10; j > 0; j--) {
+                i--;
+                $('#user_id'+j).html('<input type="radio" name="options" autocomplete="off" checked="">'+id[i-9]);
+            }
+        }
+
+    </script> 
+    
+{% endblock %}

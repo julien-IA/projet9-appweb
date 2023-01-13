@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ url_for('static', filename= 'css/style.css') }}">
+    <title>{% block title %} {% endblock %}</title>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-md navbar-light bg-light">
+        <a class="navbar-brand" href="{{ url_for('index')}}">OPENCLASSROOMS Projet 9 - Recommandations</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </nav>
+    <div class="container">
+        {% block content %} {% endblock %}
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  
+  <script>
+    $('#reco').click(function(){
+      // On vide les 2 tableaux de résultats
+      $('#table1_tbody').html('');
+      $('#table2_tbody').html('');
+
+      // récupération de l'id utilisateur sur lequel on veut faire une recommandation
+      try {
+        id_user = $(".btn.btn-secondary.active")[0].innerText;
+      } catch (error) {
+        alert("Veuillez sélectionner un identifiant d'utilisateur");
+        return;
+      }
+      
+      if(!$('#reco_1').is(':checked') && !$('#reco_2').is(':checked')) {
+        alert("Veuillez choisir au moins un type de recommandation");
+        return;
+      }
+
+      if ($('#reco_1').is(':checked')) {
+        if ($('#reco_2').is(':checked')) {
+          param_reco='3';
+        } else {
+          param_reco='1';
+        }
+      } else {
+        if ($('#reco_2').is(':checked')) {
+          param_reco='2';
+        }
+      } 
+      
+      param_ref=($('#ref1').is(':checked')?'1':$('#ref2').is(':checked')?'2':$('#ref3').is(':checked')?'3':'0');
+      param_nb_reco1=$('#nb_reco_1 option:selected').val();
+      param_nb_reco2=$('#nb_reco_2 option:selected').val();
+
+      tableLoader = ''
+      tableLoader += '<tr>';
+      tableLoader += '<th scope="row">' + '</th>';
+      tableLoader += '<td>' + '<img src=' + '"https://gifimage.net/wp-content/uploads/2017/11/gif-chargement-5.gif"' +'/>' + '</td>';
+      tableLoader += '</tr>';
+      $('#table1_tbody').html(tableLoader);
+      $('#table2_tbody').html(tableLoader);
+
+      const request = new XMLHttpRequest();
+      var formData = new FormData();
+      formData.append('id_user', id_user);
+      formData.append('param_reco',param_reco);
+      formData.append('param_ref',param_ref);
+      formData.append('param_nb_reco1',param_nb_reco1);
+      formData.append('param_nb_reco2',param_nb_reco2);
+      request.open('POST', "/reco");
+      request.onload = () => {
+        $('#table1_tbody').html('');
+        $('#table2_tbody').html('');
+        const response = JSON.parse(request.response);
+        let tableHTML='';
+        tab=0
+        for (let key in response) {
+          tab++;
+          tableHTML += '<tr>';
+          for (let i = 0; i < response[key].length; i++) {
+            tableHTML += '<th scope="row">' + i + '</th>';
+            tableHTML += '<td>' + response[key][i][0] + '</td>';
+            tableHTML += '<td>' + response[key][i][1] + '</td>';
+            tableHTML += '</tr>';
+          }
+          if(tab==1 && $('#reco_1').is(':checked')){
+            $('#table1_tbody').html(tableHTML);
+            tableHTML=''; 
+          }else{
+            $('#table2_tbody').html(tableHTML);
+          }
+        }        
+      }; 
+      tableLoader = ''
+      tableLoader += '<tr>';
+      tableLoader += '<th scope="row">' + '</th>';
+      tableLoader += '<td>' + '<img src=' + '"https://gifimage.net/wp-content/uploads/2017/11/gif-chargement-5.gif"' +'/>' + '</td>';
+      tableLoader += '</tr>';
+      $('#table1_tbody').html(tableLoader);
+      $('#table2_tbody').html(tableLoader);
+      request.send(formData);
+    })
+  
+  
+  
+  </script>
+  
+  </body>
+</html>
